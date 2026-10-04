@@ -1,6 +1,11 @@
 package prices
 
-import "fmt"
+import (
+	"fmt"
+
+	"example.com/price-calculator/conversion"
+	"example.com/price-calculator/filemanager"
+)
 
 type PricesAdjustmentJob struct {
 	TaxRate           float64
@@ -10,17 +15,41 @@ type PricesAdjustmentJob struct {
 
 func NewPricesAdjustmentJob(taxRate float64) *PricesAdjustmentJob {
 	return &PricesAdjustmentJob{
-		TaxRate:     taxRate,
-		InputPrices: []float64{10.0, 20.0, 30.0},
+		TaxRate: taxRate,
 	}
 }
 
-func (job PricesAdjustmentJob) Process() {
-	adjustedPrices := make(map[string]float64, len(job.InputPrices))
+func (job *PricesAdjustmentJob) loadData() error {
+	prices, err := filemanager.ReadLines("input/prices.txt")
+
+	if err != nil {
+		return err
+	}
+
+	job.InputPrices, err = conversion.StringsToFloats(prices)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (job *PricesAdjustmentJob) Process() error {
+	err := job.loadData()
+
+	if err != nil {
+		return err
+	}
+
+	adjustedPrices := make(map[string]string, len(job.InputPrices))
 
 	for _, price := range job.InputPrices {
-		adjustedPrices[fmt.Sprintf("%.2f", price)] = price * (1 + job.TaxRate)
+		adjustedPrice := price * (1 + job.TaxRate)
+		adjustedPrices[fmt.Sprintf("%.2f", price)] = fmt.Sprintf("%.2f", adjustedPrice)
 	}
 
 	fmt.Println(adjustedPrices)
+
+	return nil
 }
