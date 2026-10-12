@@ -53,7 +53,7 @@ func (job *PricesAdjustmentJob) Process() error {
 
 	job.TaxAdjustedPrices = adjustedPrices
 
-	err = job.IOManager.WriteJSON(job)
+	err = job.IOManager.WriteResults(job)
 
 	if err != nil {
 		return err
