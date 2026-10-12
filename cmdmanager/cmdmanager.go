@@ -4,6 +4,10 @@ import "fmt"
 
 type CMDManager struct{}
 
+func New() *CMDManager {
+	return &CMDManager{}
+}
+
 func (cm CMDManager) ReadLines() ([]string, error) {
 	fmt.Println("Please provide the prices (0 to terminate). Confirm entry to each line by pressing enter.")
 
