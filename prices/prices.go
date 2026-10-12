@@ -8,21 +8,21 @@ import (
 )
 
 type PricesAdjustmentJob struct {
-	IOManager         iomanager.IOManager `json:"-"`
-	TaxRate           float64             `json:"tax_rate"`
-	InputPrices       []float64           `json:"input_prices"`
-	TaxAdjustedPrices map[string]string   `json:"tax_adjusted_prices"`
+	ioManager         iomanager.IOManager
+	TaxRate           float64           `json:"tax_rate"`
+	InputPrices       []float64         `json:"input_prices"`
+	TaxAdjustedPrices map[string]string `json:"tax_adjusted_prices"`
 }
 
 func NewPricesAdjustmentJob(ioManager iomanager.IOManager, taxRate float64) *PricesAdjustmentJob {
 	return &PricesAdjustmentJob{
-		IOManager: ioManager,
+		ioManager: ioManager,
 		TaxRate:   taxRate,
 	}
 }
 
 func (job *PricesAdjustmentJob) loadData() error {
-	prices, err := job.IOManager.ReadLines()
+	prices, err := job.ioManager.ReadLines()
 
 	if err != nil {
 		return err
@@ -53,5 +53,5 @@ func (job *PricesAdjustmentJob) Process() error {
 
 	job.TaxAdjustedPrices = adjustedPrices
 
-	return job.IOManager.WriteResults(job)
+	return job.ioManager.WriteResults(job)
 }
