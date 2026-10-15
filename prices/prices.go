@@ -37,11 +37,12 @@ func (job *PricesAdjustmentJob) loadData() error {
 	return nil
 }
 
-func (job *PricesAdjustmentJob) Process() error {
+func (job *PricesAdjustmentJob) Process(doneChan chan bool, errChan chan error) {
 	err := job.loadData()
 
 	if err != nil {
-		return err
+		errChan <- err
+		return
 	}
 
 	adjustedPrices := make(map[string]string, len(job.InputPrices))
@@ -53,5 +54,12 @@ func (job *PricesAdjustmentJob) Process() error {
 
 	job.TaxAdjustedPrices = adjustedPrices
 
-	return job.ioManager.WriteResults(job)
+	err = job.ioManager.WriteResults(job)
+
+	if err != nil {
+		errChan <- err
+		return
+	}
+
+	doneChan <- true
 }
